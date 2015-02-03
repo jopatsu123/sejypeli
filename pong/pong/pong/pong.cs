@@ -50,14 +50,13 @@ public class pong : PhysicsGame
         vasenReuna.Restitution = 1.0;
         vasenReuna.IsVisible = false;
          oikeaReuna = Level.CreateRightBorder();
-        vasenReuna.Restitution = 1.0;
-        vasenReuna.IsVisible = false;
+         oikeaReuna.Restitution = 1.0;
+         oikeaReuna.IsVisible = false;
+       
         PhysicsObject alareuna = Level.CreateBottomBorder();
-        vasenReuna.Restitution = 1.0;
-        vasenReuna.IsVisible = false;
+       
         PhysicsObject yläReuna = Level.CreateTopBorder();
-        vasenReuna.Restitution = 1.0;
-        vasenReuna.IsVisible = false;
+        
 AddCollisionHandler(pallo, KasittelePallonTormays);
         Level.Background.Color = Color.Black;
         Camera.ZoomToLevel();
