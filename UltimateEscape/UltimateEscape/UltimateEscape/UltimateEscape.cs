@@ -8,16 +8,21 @@ using Jypeli.Widgets;
 
 public class UltimateEscape : PhysicsGame
 {
-    double nopeusYlos=200; 
-    double nopeusAlas =200; 
-    double nopeusVasemmalle=200;
-    double nopeusOikealle = -200;
+    double nopeusYlos=500;
+    Vector kiipeaYlos = new Vector(0, 500); 
+    double nopeusVasemmalle=350;
+    double nopeusOikealle = -350;
     PlatformCharacter pelaaja;
     Image taustakuva = LoadImage("taistis");
     Image tikkuukko = LoadImage("oik");  
-  
+    private Animation Kiipeaminen;
+
+    
     public override void Begin()
     {
+       Kiipeaminen=LoadAnimation("anima"); 
+       
+        
         Gravity = new Vector(0.0, -800.0);
         Level.Background.Color = Color.White;
         Level.Background.Image = taustakuva;
@@ -27,7 +32,7 @@ public class UltimateEscape : PhysicsGame
         luovalikko();
         LuoPistelaskuri();
         luocontrors();
-
+        
         PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
     }
@@ -63,9 +68,13 @@ public class UltimateEscape : PhysicsGame
     void luocontrors()
     {
         Keyboard.Listen(Key.A, ButtonState.Down, LiikutaHahmoa, "liiku vasemmalle",nopeusOikealle);
-       // Keyboard.Listen(Key.A, ButtonState.Released, LiikutaHahmoa, "liiku vasemmalle", Vector.Zero);
-
+       Keyboard.Listen(Key.D, ButtonState.Down, LiikutaHahmoa, "liiku oikealle", nopeusVasemmalle);
+       Keyboard.Listen(Key.W, ButtonState.Down, PelaajaHyppaa, "hyppaa", nopeusYlos);
+       
+       Keyboard.Listen(Key.E, ButtonState.Pressed, kiipea, "kiipea",1,kiipeaYlos);
+       Keyboard.Listen(Key.E, ButtonState.Released,kiipea,"stopanim",2,Vector.Zero);
 }
+
     void aloitapeli()
     {
         Level.Background.Image=null;
@@ -93,13 +102,38 @@ ruudut.Execute(20, 20);
     }
     void LiikutaHahmoa(double nopeus)
     {
-        pelaaja.Walk(nopeus); 
-
+        pelaaja.Walk(nopeus);
+        
 
 
 
     }
+    void PelaajaHyppaa(double nopeus)
+    {
+        pelaaja.Jump(nopeus);
+        
+
     }
+    void kiipea(int animstop,Vector nopeus)
+    {
+        pelaaja.Animation = new Animation(Kiipeaminen);
+        pelaaja.Animation= (Kiipeaminen);
+        pelaaja.Velocity = nopeus;
+        
+        if (animstop == 1)
+        {
+
+         pelaaja.Animation.Start();
+        }
+        else if (animstop == 2)
+        {
+            pelaaja.Image = tikkuukko;  
+pelaaja.Animation.Stop();
+        }
+    }
+    }
+
+
 
 
 
