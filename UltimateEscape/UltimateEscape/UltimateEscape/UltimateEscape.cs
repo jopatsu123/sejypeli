@@ -9,32 +9,26 @@ using Jypeli.Widgets;
 public class UltimateEscape : PhysicsGame
 {
     double nopeusYlos=500;
-    Vector kiipeaYlos = new Vector(0, 500); 
+    Vector kiipeaYlos = new Vector(0, 200); 
     double nopeusVasemmalle=350;
     double nopeusOikealle = -350;
     PlatformCharacter pelaaja;
     Image taustakuva = LoadImage("taistis");
     Image tikkuukko = LoadImage("oik");  
     private Animation Kiipeaminen;
-
+    List<int> Lista;
     
     public override void Begin()
     {
-       Kiipeaminen=LoadAnimation("anima"); 
-       
-        
-        Gravity = new Vector(0.0, -800.0);
-        Level.Background.Color = Color.White;
+         Lista = new List<int>();
         Level.Background.Image = taustakuva;
       
         Level.Background.Width = Screen.Width;
         Level.Background.Height = Screen.Height;
         luovalikko();
-        LuoPistelaskuri();
-        luocontrors();
+      
         
-        PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
-        Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
+     
     }
     void LuoKentta(Vector paikka, double leveys, double korkeus)
     {
@@ -48,11 +42,13 @@ public class UltimateEscape : PhysicsGame
     }
     void luopelaaja(Vector paikka, double leveys, double korkeus)
     {
+       
+        
         pelaaja = new PlatformCharacter(100, 100);
         pelaaja.Image = tikkuukko;
         pelaaja.Position = paikka;
         Add(pelaaja);
-        
+        AddCollisionHandler(pelaaja, pelaajatormasi);
     }
 
     void luovalikko()
@@ -71,7 +67,7 @@ public class UltimateEscape : PhysicsGame
        Keyboard.Listen(Key.D, ButtonState.Down, LiikutaHahmoa, "liiku oikealle", nopeusVasemmalle);
        Keyboard.Listen(Key.W, ButtonState.Down, PelaajaHyppaa, "hyppaa", nopeusYlos);
        
-       Keyboard.Listen(Key.E, ButtonState.Pressed, kiipea, "kiipea",1,kiipeaYlos);
+       Keyboard.Listen(Key.E, ButtonState.Down, kiipea, "kiipea",1,kiipeaYlos);
        Keyboard.Listen(Key.E, ButtonState.Released,kiipea,"stopanim",2,Vector.Zero);
 }
 
@@ -82,15 +78,23 @@ public class UltimateEscape : PhysicsGame
         Camera.Zoom(0.6);
         ruudut.SetTileMethod(Color.Black, LuoKentta);
         ruudut.SetTileMethod(Color.FromHexCode("00FF21"), luopelaaja);
-ruudut.Execute(20, 20);
-   
-    
+        ruudut.SetTileMethod(Color.FromHexCode("FF0000"), luoulospaasy);
+
+        ruudut.Execute(20, 20);
+        Kiipeaminen = LoadAnimation("anima");
+        PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
+        Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
+       
+        Gravity = new Vector(0.0, -800.0);
+        Level.Background.Color = Color.White;
+        LuoPistelaskuri();
+        luocontrors();
     
     }
     void LuoPistelaskuri()
     {
        IntMeter pisteLaskuri = new IntMeter(30);
-
+      
         Label pisteNaytto = new Label();
         pisteNaytto.X = Screen.Left + 100;
         pisteNaytto.Y = Screen.Top - 100;
@@ -131,7 +135,38 @@ ruudut.Execute(20, 20);
 pelaaja.Animation.Stop();
         }
     }
+    void luoulospaasy(Vector paikka, double leveys, double korkeus)
+    {
+        int luku = RandomGen.NextInt(4);
+        PhysicsObject sulku = PhysicsObject.CreateStaticObject(50, 50);
+        Add(sulku);
+        sulku.Position=paikka;
+        sulku.Color = Color.Black;
+        sulku.Tag = "sulku"+luku;
+        Lista.Add(4);
+       
+
     }
+    void pelaajatormasi(PhysicsObject tormaaja, PhysicsObject kohde)
+    {
+        if (kohde.Tag.ToString() == "sulku1")
+        {
+            ClearAll();
+            aloitapeli();
+            
+        
+        }
+
+
+    
+    
+    
+    }
+    }
+
+
+
+
 
 
 
