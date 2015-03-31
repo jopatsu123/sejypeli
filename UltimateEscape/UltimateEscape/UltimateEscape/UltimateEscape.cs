@@ -14,9 +14,11 @@ public class UltimateEscape : PhysicsGame
     double nopeusOikealle = -350;
     PlatformCharacter pelaaja;
     Image taustakuva = LoadImage("taistis");
+    Image Vihollinen = LoadImage("vihollinen");
     Image tikkuukko = LoadImage("oik");  
     private Animation Kiipeaminen;
     List<int> Lista;
+    PlatformCharacter vihollinen;
     
     public override void Begin()
     {
@@ -26,7 +28,7 @@ public class UltimateEscape : PhysicsGame
         Level.Background.Width = Screen.Width;
         Level.Background.Height = Screen.Height;
         luovalikko();
-      
+        
         
      
     }
@@ -49,8 +51,13 @@ public class UltimateEscape : PhysicsGame
         pelaaja.Position = paikka;
         Add(pelaaja);
         AddCollisionHandler(pelaaja, pelaajatormasi);
+      pelaaja.Weapon = new AssaultRifle(50, 30);
+     pelaaja.Weapon.Ammo.Value = 100;
+     pelaaja.Weapon.ProjectileCollision = AmmusOsui;
+     pelaaja.Weapon.Power.DefaultValue = 500;
+     pelaaja.Weapon.X += 25;
+     pelaaja.Weapon.Y += 20;
     }
-
     void luovalikko()
     {
         MultiSelectWindow alkuValikko = new MultiSelectWindow("Ultimate Escape",
@@ -66,7 +73,7 @@ public class UltimateEscape : PhysicsGame
         Keyboard.Listen(Key.A, ButtonState.Down, LiikutaHahmoa, "liiku vasemmalle",nopeusOikealle);
        Keyboard.Listen(Key.D, ButtonState.Down, LiikutaHahmoa, "liiku oikealle", nopeusVasemmalle);
        Keyboard.Listen(Key.W, ButtonState.Down, PelaajaHyppaa, "hyppaa", nopeusYlos);
-       
+       Keyboard.Listen(Key.Space, ButtonState.Down, PelaajaAmpuu, "Ammu");
        Keyboard.Listen(Key.E, ButtonState.Down, kiipea, "kiipea",1,kiipeaYlos);
        Keyboard.Listen(Key.E, ButtonState.Released,kiipea,"stopanim",2,Vector.Zero);
 }
@@ -79,6 +86,7 @@ public class UltimateEscape : PhysicsGame
         ruudut.SetTileMethod(Color.Black, LuoKentta);
         ruudut.SetTileMethod(Color.FromHexCode("00FF21"), luopelaaja);
         ruudut.SetTileMethod(Color.FromHexCode("FF0000"), luoulospaasy);
+        ruudut.SetTileMethod(Color.FromHexCode("FFD800"), luovihollinen);
 
         ruudut.Execute(20, 20);
         Kiipeaminen = LoadAnimation("anima");
@@ -162,7 +170,51 @@ pelaaja.Animation.Stop();
     
     
     }
+    void PelaajaAmpuu()
+    {
+        PhysicsObject ammus = pelaaja.Weapon.Shoot();
+
+
     }
+    void AmmusOsui(PhysicsObject ammus, PhysicsObject kohde)
+    {
+        ammus.Destroy();
+
+
+
+
+    }
+    void luovihollinen(Vector paikka, double leveys, double korkeus)
+    {
+        PlatformCharacter vihollinen = new PlatformCharacter(100, 100);
+        vihollinen.Image = Vihollinen;
+        vihollinen.Position = paikka;
+        Add(vihollinen);
+        AddCollisionHandler(vihollinen, pelaajatormasi);
+        vihollinen.Weapon = new AssaultRifle(50, 30);
+        vihollinen.Weapon.Ammo.Value = 100;
+        vihollinen.Weapon.ProjectileCollision = AmmusOsui;
+        vihollinen.Weapon.Power.DefaultValue = 500;
+        vihollinen.Weapon.X += 25;
+        vihollinen.Weapon.Y += 20;
+        FollowerBrain seuraajanAivot = new FollowerBrain(vihollinen);
+        seuraajanAivot.Speed = 300;                
+        seuraajanAivot.DistanceFar = 600;           
+        seuraajanAivot.DistanceClose = 200;         
+        seuraajanAivot.StopWhenTargetClose = true;
+        seuraajanAivot.TargetClose += mitaTapahtuuKunOllaanLahella;
+
+
+    }
+    void mitaTapahtuuKunOllaanLahella()
+{
+    vihollinen.Weapon.Shoot();
+
+
+
+}
+}
+
 
 
 
