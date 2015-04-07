@@ -19,7 +19,9 @@ public class UltimateEscape : PhysicsGame
     private Animation Kiipeaminen;
     List<int> Lista;
     PlatformCharacter vihollinen;
-    
+    AssaultRifle vihase;
+    PhysicsObject[] viholliset;
+    int esjonne;
     public override void Begin()
     {
          Lista = new List<int>();
@@ -28,8 +30,7 @@ public class UltimateEscape : PhysicsGame
         Level.Background.Width = Screen.Width;
         Level.Background.Height = Screen.Height;
         luovalikko();
-        
-        
+        viholliset = new PhysicsObject[5];
      
     }
     void LuoKentta(Vector paikka, double leveys, double korkeus)
@@ -97,7 +98,8 @@ public class UltimateEscape : PhysicsGame
         Level.Background.Color = Color.White;
         LuoPistelaskuri();
         luocontrors();
-    
+        
+        
     }
     void LuoPistelaskuri()
     {
@@ -179,41 +181,61 @@ pelaaja.Animation.Stop();
     void AmmusOsui(PhysicsObject ammus, PhysicsObject kohde)
     {
         ammus.Destroy();
-
-
+        if (kohde.Tag.ToString() == "destroy")
+        {
+            kohde.Destroy();
+        }
 
 
     }
     void luovihollinen(Vector paikka, double leveys, double korkeus)
     {
-        PlatformCharacter vihollinen = new PlatformCharacter(100, 100);
+         vihollinen = new PlatformCharacter(100, 100);
         vihollinen.Image = Vihollinen;
         vihollinen.Position = paikka;
         Add(vihollinen);
         AddCollisionHandler(vihollinen, pelaajatormasi);
-        vihollinen.Weapon = new AssaultRifle(50, 30);
-        vihollinen.Weapon.Ammo.Value = 100;
-        vihollinen.Weapon.ProjectileCollision = AmmusOsui;
-        vihollinen.Weapon.Power.DefaultValue = 500;
-        vihollinen.Weapon.X += 25;
-        vihollinen.Weapon.Y += 20;
-        FollowerBrain seuraajanAivot = new FollowerBrain(vihollinen);
+        vihollinen.Tag = "destroy";
+       
+        vihase = new AssaultRifle(50, 30);
+        
+        vihase.ProjectileCollision = AmmusOsui;
+        vihase.Power.DefaultValue = 500;
+        vihase.X += 25;
+        vihase.Y += 20;
+        vihollinen.Weapon=vihase;
+        luoaivot();
+        Timer ajastin = new Timer();
+        ajastin.Interval = 2.0;
+        ajastin.Timeout += delegate { vihollinenampuu(vihollinen); };
+        ajastin.Start();
+        viholliset[esjonne] = new PhysicsObject(40, 40);
+    
+    }
+  
+    void luoaivot()
+    {
+        PlatformWandererBrain seuraajanAivot = new PlatformWandererBrain();
+        seuraajanAivot.Active = true;
         seuraajanAivot.Speed = 300;                
-        seuraajanAivot.DistanceFar = 600;           
-        seuraajanAivot.DistanceClose = 200;         
-        seuraajanAivot.StopWhenTargetClose = true;
-        seuraajanAivot.TargetClose += mitaTapahtuuKunOllaanLahella;
+       // seuraajanAivot.DistanceFar = 600;           
+        //seuraajanAivot.DistanceClose = 200;         
+        //seuraajanAivot.StopWhenTargetClose = true;
+        
+        vihollinen.Brain = seuraajanAivot;
+      
 
 
     }
-    void mitaTapahtuuKunOllaanLahella()
-{
-    vihollinen.Weapon.Shoot();
+    void vihollinenampuu(PlatformCharacter ase)
+    {
+        ase.Weapon.Shoot();
+         
 
-
-
+    }
 }
-}
+
+
 
 
 
